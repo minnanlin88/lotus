@@ -588,6 +588,12 @@ func (sb *Sealer) ReplicaUpdate(ctx context.Context, sector storage.SectorRef, p
 	//return nil, nil
 }
 
+func (sb *Sealer) ReleaseSealed(ctx context.Context, sector storage.SectorRef) error {
+	panic("implemente me")
+	// XXX once we have an ffi call put it in ehre
+	//return nil
+}
+
 func (sb *Sealer) FinalizeSector(ctx context.Context, sector storage.SectorRef, keepUnsealed []storage.Range) error {
 	ssize, err := sector.ProofType.SectorSize()
 	if err != nil {

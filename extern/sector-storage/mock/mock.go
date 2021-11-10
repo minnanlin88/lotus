@@ -267,6 +267,10 @@ func (mgr *SectorMgr) ReplicaUpdate(ctx context.Context, sid storage.SectorRef, 
 	return out, nil
 }
 
+func (mgr *SectorMgr) ReleaseSealed(ctx context.Context, sid storage.SectorRef) error {
+	return nil
+}
+
 // Test Instrumentation Methods
 
 func (mgr *SectorMgr) MarkFailed(sid storage.SectorRef, failed bool) error {

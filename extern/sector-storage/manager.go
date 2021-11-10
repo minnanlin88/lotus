@@ -579,6 +579,10 @@ func (m *Manager) ReleaseUnsealed(ctx context.Context, sector storage.SectorRef,
 	return nil
 }
 
+func (m *Manager) ReleaseSealed(ctx context.Context, sector storage.SectorRef) error {
+	panic("implement me")
+}
+
 func (m *Manager) Remove(ctx context.Context, sector storage.SectorRef) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()

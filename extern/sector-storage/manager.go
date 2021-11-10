@@ -3,6 +3,7 @@ package sectorstorage
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"sync"
@@ -601,6 +602,61 @@ func (m *Manager) Remove(ctx context.Context, sector storage.SectorRef) error {
 	return err
 }
 
+func (m *Manager) ReplicaUpdate(ctx context.Context, sector storage.SectorRef, pieces []abi.PieceInfo) (out storage.ReplicaUpdateProof, err error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	fmt.Printf("Manager, getting worker\n")
+
+	wk, wait, cancel, err := m.getWork(ctx, sealtasks.TTReplicaUpdate, sector, pieces)
+	if err != nil {
+		return nil, xerrors.Errorf("getWork: %w", err)
+	}
+	defer cancel()
+
+	var waitErr error
+	waitRes := func() {
+		p, werr := m.waitWork(ctx, wk)
+		if werr != nil {
+			waitErr = werr
+			return
+		}
+		if p != nil {
+			out = p.([]byte)
+		}
+	}
+
+	if wait { // already in progress
+		waitRes()
+		return out, waitErr
+	}
+
+	if err := m.index.StorageLock(ctx, sector.ID, storiface.FTSealed, storiface.FTUpdate); err != nil {
+		return nil, xerrors.Errorf("acquiring sector lock: %w", err)
+	}
+
+	selector := newAllocSelector(m.index, storiface.FTUpdate, storiface.PathSealing)
+
+	// XXX: do I need to include FTUpdate in schedFetch when this is being allocated.  Does Schedule and the selector for this handle allocating already?
+	// XXX: is AcquireMove the right thing to be doing here?
+	fmt.Printf("Manager, scheduling\n")
+	err = m.sched.Schedule(ctx, sector, sealtasks.TTReplicaUpdate, selector, m.schedFetch(sector, storiface.FTSealed, storiface.PathSealing, storiface.AcquireMove), func(ctx context.Context, w Worker) error {
+
+		fmt.Printf("Manager starting work\n")
+		err := m.startWork(ctx, w, wk)(w.ReplicaUpdate(ctx, sector, pieces))
+		if err != nil {
+			return err
+		}
+
+		waitRes()
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return out, waitErr
+}
+
 func (m *Manager) ReturnAddPiece(ctx context.Context, callID storiface.CallID, pi abi.PieceInfo, err *storiface.CallError) error {
 	return m.returnResult(ctx, callID, pi, err)
 }
@@ -626,6 +682,10 @@ func (m *Manager) ReturnFinalizeSector(ctx context.Context, callID storiface.Cal
 }
 
 func (m *Manager) ReturnReleaseUnsealed(ctx context.Context, callID storiface.CallID, err *storiface.CallError) error {
+	return m.returnResult(ctx, callID, nil, err)
+}
+
+func (m *Manager) ReturnReplicaUpdate(ctx context.Context, callID storiface.CallID, err *storiface.CallError) error {
 	return m.returnResult(ctx, callID, nil, err)
 }
 

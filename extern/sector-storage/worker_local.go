@@ -3,6 +3,7 @@ package sectorstorage
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"reflect"
@@ -166,6 +167,7 @@ const (
 	SealCommit1     ReturnType = "SealCommit1"
 	SealCommit2     ReturnType = "SealCommit2"
 	FinalizeSector  ReturnType = "FinalizeSector"
+	ReplicaUpdate   ReturnType = "ReplicaUpdate"
 	ReleaseUnsealed ReturnType = "ReleaseUnsealed"
 	MoveStorage     ReturnType = "MoveStorage"
 	UnsealPiece     ReturnType = "UnsealPiece"
@@ -214,6 +216,7 @@ var returnFunc = map[ReturnType]func(context.Context, storiface.CallID, storifac
 	SealCommit2:     rfunc(storiface.WorkerReturn.ReturnSealCommit2),
 	FinalizeSector:  rfunc(storiface.WorkerReturn.ReturnFinalizeSector),
 	ReleaseUnsealed: rfunc(storiface.WorkerReturn.ReturnReleaseUnsealed),
+	ReplicaUpdate:   rfunc(storiface.WorkerReturn.ReturnReplicaUpdate),
 	MoveStorage:     rfunc(storiface.WorkerReturn.ReturnMoveStorage),
 	UnsealPiece:     rfunc(storiface.WorkerReturn.ReturnUnsealPiece),
 	Fetch:           rfunc(storiface.WorkerReturn.ReturnFetch),
@@ -379,6 +382,18 @@ func (l *LocalWorker) SealCommit2(ctx context.Context, sector storage.SectorRef,
 
 	return l.asyncCall(ctx, sector, SealCommit2, func(ctx context.Context, ci storiface.CallID) (interface{}, error) {
 		return sb.SealCommit2(ctx, sector, phase1Out)
+	})
+}
+
+func (l *LocalWorker) ReplicaUpdate(ctx context.Context, sector storage.SectorRef, pieces []abi.PieceInfo) (storiface.CallID, error) {
+	fmt.Printf("local worker Replica Update\n")
+	sb, err := l.executor()
+	if err != nil {
+		return storiface.UndefCall, err
+	}
+
+	return l.asyncCall(ctx, sector, ReplicaUpdate, func(ctx context.Context, ci storiface.CallID) (interface{}, error) {
+		return sb.ReplicaUpdate(ctx, sector, pieces)
 	})
 }
 

@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -159,6 +160,86 @@ func TestSimple(t *testing.T) {
 	ticket := abi.SealRandomness{9, 9, 9, 9, 9, 9, 9, 9}
 
 	_, err = m.SealPreCommit1(ctx, sid, ticket, pieces)
+	require.NoError(t, err)
+}
+
+type Reader struct{}
+
+func (Reader) Read(out []byte) (int, error) {
+	for i := range out {
+		out[i] = 0
+	}
+	return len(out), nil
+}
+
+type NullReader struct {
+	*io.LimitedReader
+}
+
+func NewNullReader(size abi.UnpaddedPieceSize) io.Reader {
+	return &NullReader{(io.LimitReader(&Reader{}, int64(size))).(*io.LimitedReader)}
+}
+
+func (m NullReader) NullBytes() int64 {
+	return m.N
+}
+
+func TestSnapDeals(t *testing.T) {
+	logging.SetAllLoggers(logging.LevelWarn)
+
+	ctx := context.Background()
+	m, lstor, stor, idx, cleanup := newTestMgr(ctx, t, datastore.NewMapDatastore())
+	defer cleanup()
+
+	localTasks := []sealtasks.TaskType{
+		sealtasks.TTAddPiece, sealtasks.TTPreCommit1, sealtasks.TTPreCommit2, sealtasks.TTCommit1, sealtasks.TTCommit2, sealtasks.TTFinalize, sealtasks.TTFetch, sealtasks.TTReplicaUpdate,
+	}
+	wds := datastore.NewMapDatastore()
+
+	w := NewLocalWorker(WorkerConfig{TaskTypes: localTasks}, stor, lstor, idx, m, statestore.New(wds))
+	err := m.AddWorker(ctx, w)
+	require.NoError(t, err)
+
+	sid := storage.SectorRef{
+		ID:        abi.SectorID{Miner: 1000, Number: 1},
+		ProofType: abi.RegisteredSealProof_StackedDrg2KiBV1,
+	}
+
+	// Pack sector with no pieces
+	p0, err := m.AddPiece(ctx, sid, nil, 2*1016, NewNullReader(2*1016))
+	require.NoError(t, err)
+	ccPieces := []abi.PieceInfo{p0}
+
+	// Precommit and Seal a CC sector
+	fmt.Printf("PC1\n")
+	ticket := abi.SealRandomness{9, 9, 9, 9, 9, 9, 9, 9}
+	pc1Out, err := m.SealPreCommit1(ctx, sid, ticket, ccPieces)
+	require.NoError(t, err)
+	fmt.Printf("PC2\n")
+	pc2Out, err := m.SealPreCommit2(ctx, sid, pc1Out)
+	require.NoError(t, err)
+	seed := abi.InteractiveSealRandomness{1, 1, 1, 1, 1, 1, 1}
+	fmt.Printf("C1\n")
+	c1Out, err := m.SealCommit1(ctx, sid, ticket, seed, nil, pc2Out)
+	require.NoError(t, err)
+	fmt.Printf("C2\n")
+	_, err = m.SealCommit2(ctx, sid, c1Out)
+	require.NoError(t, err)
+
+	// Now do a snap deals replica update
+
+	p1, err := m.AddPiece(ctx, sid, nil, 1016, strings.NewReader(strings.Repeat("testthis", 127)))
+	require.NoError(t, err)
+	require.Equal(t, abi.PaddedPieceSize(1024), p1.Size)
+
+	p2, err := m.AddPiece(ctx, sid, nil, 1016, bytes.NewReader(make([]byte, 1016)[:]))
+	require.NoError(t, err)
+	require.Equal(t, abi.PaddedPieceSize(1024), p2.Size)
+
+	pieces := []abi.PieceInfo{p1, p2}
+
+	out, err := m.ReplicaUpdate(ctx, sid, pieces)
+	_ = out
 	require.NoError(t, err)
 }
 

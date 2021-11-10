@@ -582,6 +582,12 @@ func (sb *Sealer) SealCommit2(ctx context.Context, sector storage.SectorRef, pha
 	return ffi.SealCommitPhase2(phase1Out, sector.ID.Number, sector.ID.Miner)
 }
 
+func (sb *Sealer) ReplicaUpdate(ctx context.Context, sector storage.SectorRef, pieces []abi.PieceInfo) (storage.ReplicaUpdateProof, error) {
+	panic("implemente me")
+	// XXX once we have an ffi call put it in here
+	//return nil, nil
+}
+
 func (sb *Sealer) FinalizeSector(ctx context.Context, sector storage.SectorRef, keepUnsealed []storage.Range) error {
 	ssize, err := sector.ProofType.SectorSize()
 	if err != nil {

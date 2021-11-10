@@ -59,6 +59,10 @@ func (t *testExec) Remove(ctx context.Context, sector storage.SectorRef) error {
 	panic("implement me")
 }
 
+func (t *testExec) ReplicaUpdate(ctx context.Context, sector storage.SectorRef, pieces []abi.PieceInfo) (storage.ReplicaUpdateProof, error) {
+	panic("implement me")
+}
+
 func (t *testExec) NewSector(ctx context.Context, sector storage.SectorRef) error {
 	panic("implement me")
 }

@@ -1,0 +1,6 @@
+echo "client import 500k.jmx"
+./lotus client import 500k.jmx
+echo "sleep 3"
+sleep 3
+echo "client deal bafk2bzacebzr7lyogi2s3fbmkcx5fo3cyrmocvo6x6oby2mwfolera7q74u5e "
+./lotus client deal bafk2bzacebzr7lyogi2s3fbmkcx5fo3cyrmocvo6x6oby2mwfolera7q74u5e t01000 0.0000000002 518400

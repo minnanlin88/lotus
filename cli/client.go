@@ -451,7 +451,8 @@ The minimum value is 518400 (6 months).`,
 		// Check if the address is a verified client
 		dcap, err := api.StateVerifiedClientStatus(ctx, a, types.EmptyTSK)
 		if err != nil {
-			return err
+			log.Warnf("[linyh]actor not found,ignore it,becasue client deal now is free!!!!")
+			return err  //update by linyh 11-17   will not check it as must!
 		}
 
 		isVerified := dcap != nil

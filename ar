@@ -1,0 +1,1 @@
+./lotus client retrieve --from=t3wvnwsavc2bktssjlrmfhaot2o2q6u7fnrajpr4ggyzshywrjvzvuwjjnxr3c5byh7l4ssmlzriia7vjp5cra $1 /opt/download/$2

@@ -5,35 +5,35 @@
       "Type": "account",
       "Balance": "50000000000000000000000000",
       "Meta": {
-        "Owner": "t3syf2lheitwxhokkbtxufk7j65cf725zer5rry37f4rsxqcbtrn3rljeowwnzvzuemtckm6yy2frogtxifkxq"
+        "Owner": "t3sqnrc5o2bnlkbwimoc5grncr7eaab22xjo7onud4icd7zg6lyxvmra3j555mlilgobhw4bhxvz5bazrelwfq"
       }
     }
   ],
   "Miners": [
     {
       "ID": "t01000",
-      "Owner": "t3syf2lheitwxhokkbtxufk7j65cf725zer5rry37f4rsxqcbtrn3rljeowwnzvzuemtckm6yy2frogtxifkxq",
-      "Worker": "t3syf2lheitwxhokkbtxufk7j65cf725zer5rry37f4rsxqcbtrn3rljeowwnzvzuemtckm6yy2frogtxifkxq",
-      "PeerId": "12D3KooWJGJQ77dnhCLYSL752DhqxLTdnKW7KjaWuTKrG9xLBsne",
+      "Owner": "t3sqnrc5o2bnlkbwimoc5grncr7eaab22xjo7onud4icd7zg6lyxvmra3j555mlilgobhw4bhxvz5bazrelwfq",
+      "Worker": "t3sqnrc5o2bnlkbwimoc5grncr7eaab22xjo7onud4icd7zg6lyxvmra3j555mlilgobhw4bhxvz5bazrelwfq",
+      "PeerId": "12D3KooWEPfwtecWH5CgP1XbDmfpZcUNvEK6gURb8kqVrVFqiZyu",
       "MarketBalance": "0",
       "PowerBalance": "0",
       "SectorSize": 8388608,
       "Sectors": [
         {
           "CommR": {
-            "/": "bagboea4b5abcbc5m3zlvmpunq5j3d52ogzo2y63zoqwp6x4avjjat2cxoxdxxkkr"
+            "/": "bagboea4b5abcapji6765xuq25fzsvhzkyqho3qbjjfwi37v6cvexlejte3sybjc2"
           },
           "CommD": {
-            "/": "baga6ea4seaqot4pk7o3waoukry34iwniektlymdsi3i5j4y2scmjzk3rdoz5onq"
+            "/": "baga6ea4seaqa7ftwl36glr5agwc7qnuhc7lymjr6olfl43upmfjq75p5sccieia"
           },
           "SectorID": 0,
           "Deal": {
             "PieceCID": {
-              "/": "baga6ea4seaqot4pk7o3waoukry34iwniektlymdsi3i5j4y2scmjzk3rdoz5onq"
+              "/": "baga6ea4seaqa7ftwl36glr5agwc7qnuhc7lymjr6olfl43upmfjq75p5sccieia"
             },
             "PieceSize": 8388608,
             "VerifiedDeal": false,
-            "Client": "t3syf2lheitwxhokkbtxufk7j65cf725zer5rry37f4rsxqcbtrn3rljeowwnzvzuemtckm6yy2frogtxifkxq",
+            "Client": "t3sqnrc5o2bnlkbwimoc5grncr7eaab22xjo7onud4icd7zg6lyxvmra3j555mlilgobhw4bhxvz5bazrelwfq",
             "Provider": "t01000",
             "Label": "0",
             "StartEpoch": 0,
@@ -47,7 +47,7 @@
       ]
     }
   ],
-  "NetworkName": "localnet-a4f903e0-1609-4b6c-8bac-db372ffd4637",
+  "NetworkName": "localnet-a5d3a282-9774-479b-b959-10f696b2f0b8",
   "VerifregRootKey": {
     "Type": "multisig",
     "Balance": "0",
